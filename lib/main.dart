@@ -78,7 +78,7 @@ class _ThemainRowState extends State<ThemainRow> {
               background: Center(
                 child: Icon(
                   Icons.delete_forever,
-                  color: Colors.red,
+                  color: Colors.grey,
                   size: 50,
                 ),
               ),
@@ -96,16 +96,17 @@ class _ThemainRowState extends State<ThemainRow> {
     }
 
     return Scaffold(
-      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text(
-          "最強排列暴力計算機",
+          "《窮舉器》",
           style: TextStyle(fontFamily: "Cubic", color: Colors.white),
         ),
         backgroundColor: Colors.grey[800],
         centerTitle: true,
       ),
       body: Container(
+        width: double.infinity,
+        height: double.infinity,
         decoration: BoxDecoration(
           image: DecorationImage(
             image: AssetImage("pics/math.jpg"),
@@ -116,264 +117,300 @@ class _ThemainRowState extends State<ThemainRow> {
             fit: BoxFit.cover,
           ),
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(height: 20),
-            //調整排列組合的項目
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: SizedBox(
-                height: 280,
-                child: Card(
-                  color: Colors.blueGrey[100]!.withValues(alpha: 0.6),
-                  shadowColor: Colors.white,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: .circular(50),
+        child: SingleChildScrollView(
+          physics: BouncingScrollPhysics(),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(height: 100),
+              //調整排列組合的項目
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: SizedBox(
+                  height: 280,
+                  child: Card(
+                    color: Colors.blueGrey[100]!.withValues(
+                      alpha: 0.6,
+                    ),
+                    shadowColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: .circular(50),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(height: 10),
+                        Text(
+                          "列表：",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontFamily: "Cubic",
+                            fontSize: 30,
+                          ),
+                        ),
+                        SizedBox(height: 10),
+
+                        Expanded(
+                          flex: 3,
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                              ),
+                              child: Row(children: MainRowWidget()),
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 50,
+                            vertical: 10,
+                          ),
+                          child: Divider(),
+                        ),
+                        Expanded(
+                          flex: 2,
+                          child: FittedBox(
+                            child: Row(
+                              mainAxisAlignment:
+                                  MainAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                  width: 90,
+                                  // height: 200,
+                                  child: TextField(
+                                    controller: addItemController,
+                                    style: TextStyle(
+                                      fontSize: 30,
+                                      fontFamily: "Cubic",
+                                    ),
+                                    textAlign: TextAlign.center,
+                                    textInputAction:
+                                        TextInputAction.done,
+                                    cursorColor: Colors.orange,
+                                    decoration: InputDecoration(
+                                      label: Text(
+                                        "新增項目",
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                      enabledBorder:
+                                          OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.all(
+                                                  .circular(50),
+                                                ),
+                                            borderSide: BorderSide(
+                                              width: 1,
+                                              color:
+                                                  Colors.grey[800]!,
+                                            ),
+                                          ),
+                                      focusedBorder:
+                                          OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.all(
+                                                  .circular(50),
+                                                ),
+
+                                            borderSide: BorderSide(
+                                              color: Colors.orange,
+                                              width: 5,
+                                            ),
+                                          ),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(width: 10),
+                                IconButton.filled(
+                                  onPressed: () {
+                                    if (addItemController.text !=
+                                        "") {
+                                      setState(() {
+                                        mainRow.add(
+                                          addItemController.text,
+                                        );
+                                      });
+                                    }
+                                    print(mainRow);
+                                    print("種類${mainRowTypes()}");
+                                    FocusManager.instance.primaryFocus
+                                        ?.unfocus();
+                                  },
+                                  icon: Icon(Icons.add, size: 50),
+                                  // color: Colors.amber,
+                                  style: IconButton.styleFrom(
+                                    foregroundColor:
+                                        Colors.orange[700],
+                                    backgroundColor:
+                                        Colors.orange[300],
+                                    overlayColor: Colors.red,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                      ],
+                    ),
                   ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(height: 10),
-                      Expanded(
-                        flex: 2,
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 50,
+                  vertical: 25,
+                ),
+                child: Divider(),
+              ),
+              ElevatedButton.icon(
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return StatefulBuilder(
+                        builder: (context, _setState) {
+                          return AlertDialog(
+                            content: ToggleButtons(
+                              direction: Axis.vertical,
+                              borderRadius: BorderRadius.circular(10),
+                              // selectedBorderColor: Colors.amber,
+                              selectedColor: Colors.orange,
+                              fillColor: Colors.amber,
+                              splashColor: Colors.amber,
+
+                              onPressed: (index) {
+                                _setState(() {
+                                  for (
+                                    var i = 0;
+                                    i < isSelections.length;
+                                    i++
+                                  ) {
+                                    if (i != index)
+                                      isSelections[i] = false;
+                                  }
+                                  isSelections[index] =
+                                      !isSelections[index];
+                                });
+                              },
+                              isSelected: isSelections,
+                              children: [
+                                Text("相鄰條件"),
+                                Text("位置條件"),
+                                Text("相對條件"),
+                              ],
+                            ),
+                            title: Text("選擇要加入的條件"),
+                            actions: [
+                              IconButton.filled(
+                                style: IconButton.styleFrom(
+                                  backgroundColor: Colors.deepOrange,
+                                ),
+                                onPressed: () {
+                                  if (isSelections[0]) {
+                                    setState(() {
+                                      ConditionsRow.add(
+                                        ConditionsBeside(
+                                          symbol1: mainRow[0],
+                                          symbol2: mainRow[1],
+                                        ),
+                                      );
+                                    });
+                                  } else if (isSelections[1]) {
+                                    setState(() {
+                                      ConditionsRow.add(
+                                        ConditionsPosition(
+                                          symbol: mainRow[0],
+                                          position: 1,
+                                        ),
+                                      );
+                                    });
+                                  } else if (isSelections[2]) {
+                                    setState(() {
+                                      ConditionsRow.add(
+                                        ConditionsDirection(
+                                          symbol1: mainRow[0],
+                                          symbol2: mainRow[1],
+                                          leftOrRight: true,
+                                        ),
+                                      );
+                                    });
+                                  }
+                                  Navigator.pop(context);
+                                },
+                                icon: Icon(Icons.check),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                  );
+                },
+                label: Text(
+                  "增加條件",
+                  style: TextStyle(fontFamily: "Cubic", fontSize: 20),
+                ),
+                iconAlignment: IconAlignment.end,
+                icon: Icon(Icons.add, size: 50),
+                // color: Colors.amber,
+                style: IconButton.styleFrom(
+                  foregroundColor: Colors.orange[700],
+                  backgroundColor: Colors.orange[300],
+                  overlayColor: Colors.red,
+                ),
+              ),
+              SizedBox(height: 20),
+              SizedBox(
+                height: 250,
+                child: Center(
+                  child: ListView.builder(
+                    // shrinkWrap: true,
+                    // physics: NeverScrollableScrollPhysics(),
+                    itemBuilder: (context, index) {
+                      return Dismissible(
+                        key: UniqueKey(),
+                        direction: DismissDirection.endToStart,
+                        onDismissed: (direction) {
+                          setState(() {
+                            ConditionsRow.removeAt(index);
+                          });
+                        },
+                        background: Container(
+                          color: Colors.red,
+                          child: Center(
+                            child: Icon(
+                              Icons.delete,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                        child: Center(
                           child: Padding(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
+                              horizontal: 40,
                             ),
-                            child: Row(children: MainRowWidget()),
+
+                            child: TypeProvider(
+                              rowTypes: mainRowTypes(),
+                              mainRow: mainRow,
+                              child: ConditionsRow[index],
+                            ),
                           ),
                         ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 50,
-                          vertical: 10,
-                        ),
-                        child: Divider(),
-                      ),
-                      Expanded(
-                        flex: 1,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SizedBox(
-                              width: 90,
-                              child: TextField(
-                                controller: addItemController,
-                                style: TextStyle(
-                                  fontSize: 30,
-                                  fontFamily: "Cubic",
-                                ),
-                                textAlign: TextAlign.center,
-                                textInputAction: TextInputAction.done,
-                                cursorColor: Colors.orange,
-                                decoration: InputDecoration(
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.all(
-                                      .circular(50),
-                                    ),
-                                    borderSide: BorderSide(
-                                      width: 1,
-                                      color: Colors.grey[800]!,
-                                    ),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.all(
-                                      .circular(50),
-                                    ),
-
-                                    borderSide: BorderSide(
-                                      color: Colors.orange,
-                                      width: 5,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            SizedBox(width: 10),
-                            IconButton.filled(
-                              onPressed: () {
-                                if (addItemController.text != "") {
-                                  setState(() {
-                                    mainRow.add(
-                                      addItemController.text,
-                                    );
-                                  });
-                                }
-                                print(mainRow);
-                                print("種類${mainRowTypes()}");
-                                FocusManager.instance.primaryFocus
-                                    ?.unfocus();
-                              },
-                              icon: Icon(Icons.add, size: 50),
-                              // color: Colors.amber,
-                              style: IconButton.styleFrom(
-                                foregroundColor: Colors.orange[700],
-                                backgroundColor: Colors.orange[300],
-                                overlayColor: Colors.red,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 10),
-                    ],
+                      );
+                    },
+                    itemCount: ConditionsRow.length,
                   ),
                 ),
               ),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: 50,
-                vertical: 25,
-              ),
-              child: Divider(),
-            ),
-            ElevatedButton.icon(
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (context) {
-                    return StatefulBuilder(
-                      builder: (context, _setState) {
-                        return AlertDialog(
-                          content: ToggleButtons(
-                            direction: Axis.vertical,
-                            borderRadius: BorderRadius.circular(10),
-                            // selectedBorderColor: Colors.amber,
-                            selectedColor: Colors.orange,
-                            fillColor: Colors.amber,
-                            splashColor: Colors.amber,
-
-                            onPressed: (index) {
-                              _setState(() {
-                                for (
-                                  var i = 0;
-                                  i < isSelections.length;
-                                  i++
-                                ) {
-                                  if (i != index)
-                                    isSelections[i] = false;
-                                }
-                                isSelections[index] =
-                                    !isSelections[index];
-                              });
-                            },
-                            isSelected: isSelections,
-                            children: [
-                              Text("相鄰條件"),
-                              Text("位置條件"),
-                              Text("相對條件"),
-                            ],
-                          ),
-                          title: Text("選擇要加入的條件"),
-                          actions: [
-                            IconButton.filled(
-                              style: IconButton.styleFrom(
-                                backgroundColor: Colors.deepOrange,
-                              ),
-                              onPressed: () {
-                                if (isSelections[0]) {
-                                  setState(() {
-                                    ConditionsRow.add(
-                                      ConditionsBeside(
-                                        symbol1: mainRow[0],
-                                        symbol2: mainRow[1],
-                                      ),
-                                    );
-                                  });
-                                } else if (isSelections[1]) {
-                                  setState(() {
-                                    ConditionsRow.add(
-                                      ConditionsPosition(
-                                        symbol: mainRow[0],
-                                        position: 1,
-                                      ),
-                                    );
-                                  });
-                                } else if (isSelections[2]) {
-                                  setState(() {
-                                    ConditionsRow.add(
-                                      ConditionsDirection(
-                                        symbol1: mainRow[0],
-                                        symbol2: mainRow[1],
-                                        leftOrRight: true,
-                                      ),
-                                    );
-                                  });
-                                }
-                                Navigator.pop(context);
-                              },
-                              icon: Icon(Icons.check),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  },
-                );
-              },
-              label: Text(
-                "增加條件",
-                style: TextStyle(fontFamily: "Cubic", fontSize: 20),
-              ),
-              iconAlignment: IconAlignment.end,
-              icon: Icon(Icons.add, size: 50),
-              // color: Colors.amber,
-              style: IconButton.styleFrom(
-                foregroundColor: Colors.orange[700],
-                backgroundColor: Colors.orange[300],
-                overlayColor: Colors.red,
-              ),
-            ),
-            SizedBox(height: 20),
-            Expanded(
-              child: Center(
-                child: ListView.builder(
-                  // shrinkWrap: true,
-                  // physics: NeverScrollableScrollPhysics(),
-                  itemBuilder: (context, index) {
-                    return Dismissible(
-                      key: UniqueKey(),
-                      direction: DismissDirection.endToStart,
-                      onDismissed: (direction) {
-                        setState(() {
-                          ConditionsRow.removeAt(index);
-                        });
-                      },
-                      background: Container(
-                        color: Colors.red,
-                        child: Center(
-                          child: Icon(
-                            Icons.delete,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                      child: Center(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 40,
-                          ),
-
-                          child: TypeProvider(
-                            rowTypes: mainRowTypes(),
-                            mainRow: mainRow,
-                            child: ConditionsRow[index],
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                  itemCount: ConditionsRow.length,
-                ),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
