@@ -13,6 +13,54 @@ class _ResultWidgetState extends State<ResultWidget> {
   late List<String> resultRow;
   late List<String> list;
   late List<bool> isTakens;
+  bool isBesideORnot({
+    required int index,
+    required String nowSymbol,
+    required String i,
+    required String you,
+    required bool besideORnot,
+  }) {
+    //false可以通過 true這round必須跳過
+    //如果是相鄰：只要旁邊有就滿足條件！！不相鄰：兩邊都要同時沒有！！
+
+    if (besideORnot) {
+      if (nowSymbol == i) {
+        if (index == list.length - 1) {
+          if (resultRow[index - 1] == you) {
+            return false;
+          }
+        } else if (index == 0) {
+          if (resultRow[index + 1] == you) {
+            return false;
+          }
+        } else if (resultRow[index - 1] == you ||
+            resultRow[index + 1] == you) {
+          return false;
+        }
+      } else {
+        return false;
+      }
+    } else {
+      if (nowSymbol == i) {
+        if (index == list.length - 1) {
+          if (!(resultRow[index - 1] == you)) {
+            return false;
+          }
+        } else if (index == 0) {
+          if (!(resultRow[index + 1] == you)) {
+            return false;
+          }
+        } else if (!(resultRow[index - 1] == you) &&
+            !(resultRow[index + 1] == you)) {
+          return false;
+        }
+      } else {
+        return false;
+      }
+    }
+
+    return true;
+  }
 
   String pText = "";
   int count = 0;
@@ -36,6 +84,36 @@ class _ResultWidgetState extends State<ResultWidget> {
     for (var j = 0; j < list.length; j++) {
       if (!mounted) return;
       if (!isTakens[j]) {
+        //條件判斷
+        // bool needToContinue = true; //當=false，代表可以過這一關
+        // bool besideORnot = false;
+        // if (list[i] == "C") {
+        //   if (j == list.length - 1) {
+        //     if ((resultRow[j - 1] == "B") == besideORnot) {
+        //       needToContinue = false;
+        //     }
+        //   } else if (j == 0) {
+        //     if ((resultRow[j + 1] == "B") == besideORnot) {
+        //       needToContinue = false;
+        //     }
+        //   } else if ((resultRow[j - 1] == "B") ==
+        //           besideORnot && //如果是相鄰：只要旁邊有就滿足條件！！不相鄰：兩邊都要同時沒有！！
+        //       (resultRow[j + 1] == "B") == besideORnot) {
+        //     needToContinue = false;
+        //   }
+        // } else {
+        //   needToContinue = false;
+        // }
+
+        if (isBesideORnot(
+          index: j,
+          nowSymbol: list[i],
+          i: "甲",
+          you: "D",
+          besideORnot: false,
+        )) {
+          continue;
+        }
         resultRow[j] = list[i];
         isTakens[j] = true;
 
@@ -54,7 +132,11 @@ class _ResultWidgetState extends State<ResultWidget> {
     //設定排列參數
     TypeProvider? provider = TypeProvider.of(context);
     list = provider!.mainRow;
-    resultRow = List.generate(list.length, (i) => "", growable: true);
+    resultRow = List.generate(
+      list.length,
+      (i) => ":)",
+      growable: true,
+    );
     isTakens = List.generate(
       list.length,
       (i) => false,
