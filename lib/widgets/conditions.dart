@@ -205,53 +205,53 @@ class _ConditionsPositionState extends State<ConditionsPosition> {
   }
 
   FocusNode focusNode = FocusNode();
-  void changePosition() {
-    TypeProvider? provider = TypeProvider.of(context);
+  // void changePosition() {
+  //   TypeProvider? provider = TypeProvider.of(context);
 
-    showDialog(
-      context: context,
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, _setState) {
-            return AlertDialog(
-              title: Text(
-                "請輸入位置",
-                style: TextStyle(color: Colors.black, fontSize: 15),
-              ),
-              content: SizedBox(
-                width: 50,
-                child: TextField(
-                  focusNode: focusNode,
-                  controller: changePosController,
-                  textInputAction: TextInputAction.done,
-                  onEditingComplete: () => _setState(() {
-                    setState(() {
-                      widget.position = int.parse(
-                        changePosController.text,
-                      );
-                    });
-                    // focusNode.unfocus();
-                  }),
-                  style: TextStyle(fontSize: 25),
-                  textAlign: TextAlign.center,
-                  cursorColor: Colors.black,
-                  decoration: InputDecoration(
-                    // label:
-                    border: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Colors.black),
-                    ),
-                    focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Colors.black),
-                    ),
-                  ),
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
+  //   showDialog(
+  //     context: context,
+  //     builder: (context) {
+  //       return StatefulBuilder(
+  //         builder: (context, _setState) {
+  //           return AlertDialog(
+  //             title: Text(
+  //               "請輸入位置",
+  //               style: TextStyle(color: Colors.black, fontSize: 15),
+  //             ),
+  //             content: SizedBox(
+  //               width: 50,
+  //               child: TextField(
+  //                 focusNode: focusNode,
+  //                 controller: changePosController,
+  //                 textInputAction: TextInputAction.done,
+  //                 onEditingComplete: () => _setState(() {
+  //                   setState(() {
+  //                     widget.position = int.parse(
+  //                       changePosController.text,
+  //                     );
+  //                   });
+  //                   // focusNode.unfocus();
+  //                 }),
+  //                 style: TextStyle(fontSize: 25),
+  //                 textAlign: TextAlign.center,
+  //                 cursorColor: Colors.black,
+  //                 decoration: InputDecoration(
+  //                   // label:
+  //                   border: UnderlineInputBorder(
+  //                     borderSide: BorderSide(color: Colors.black),
+  //                   ),
+  //                   focusedBorder: UnderlineInputBorder(
+  //                     borderSide: BorderSide(color: Colors.black),
+  //                   ),
+  //                 ),
+  //               ),
+  //             ),
+  //           );
+  //         },
+  //       );
+  //     },
+  //   );
+  // }
 
   late TextEditingController changePosController;
 
@@ -328,26 +328,26 @@ class _ConditionsPositionState extends State<ConditionsPosition> {
                 ),
               ),
             ),
-            Container(
-              padding: EdgeInsets.all(10),
-              margin: EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.all(.circular(10)),
-                border: Border.all(color: Colors.black),
-              ),
-              child: InkWell(
-                onTap: () {
-                  setState(() {
-                    changePosition();
-                  });
-                },
-                child: Text(
-                  "${widget.position}",
-                  style: TextStyle(fontSize: 25),
-                ),
-              ),
-            ),
+            // Container(
+            //   padding: EdgeInsets.all(10),
+            //   margin: EdgeInsets.all(10),
+            //   decoration: BoxDecoration(
+            //     color: Colors.white,
+            //     borderRadius: BorderRadius.all(.circular(10)),
+            //     border: Border.all(color: Colors.black),
+            //   ),
+            //   child: InkWell(
+            //     onTap: () {
+            //       setState(() {
+            //         changePosition();
+            //       });
+            //     },
+            //     child: Text(
+            //       "${widget.position}",
+            //       style: TextStyle(fontSize: 25),
+            //     ),
+            //   ),
+            // ),
             Text("位", style: TextStyle(fontSize: 25)),
             SizedBox(width: 20),
           ],
