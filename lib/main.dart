@@ -46,7 +46,19 @@ class _ThemainRowState extends State<ThemainRow> {
   late TextEditingController addItemController;
 
   //條件列
-  late List<Widget> ConditionsRow;
+  late List<Widget> ConditionWidgetRow;
+  late List<Condition> conditions;
+  void changeCondition(int index, Condition value) {
+    setState(() {
+      conditions[index] = value;
+    });
+  }
+
+  // void removeCondition(Condition value) {
+  //   setState(() {
+  //     Condition.remove(value);
+  //   });
+  // }
 
   late List<bool> isSelections;
 
@@ -55,10 +67,18 @@ class _ThemainRowState extends State<ThemainRow> {
     // TODO: implement initState
     super.initState();
     mainRow = ["A", "B", "C"];
-    ConditionsRow = [];
+    ConditionWidgetRow = [];
+    conditions = [];
     addItemController = TextEditingController();
     isSelections = [false, false, false];
   }
+
+  // @override
+  // void didChangeDependencies() {
+  //   // TODO: implement didChangeDependencies
+  //   super.didChangeDependencies();
+  //   Condition.add(value)
+  // }
 
   //給row縮放用的
   double scale = 1;
@@ -314,17 +334,20 @@ class _ThemainRowState extends State<ThemainRow> {
                                 onPressed: () {
                                   if (isSelections[0]) {
                                     setState(() {
-                                      ConditionsRow.add(
-                                        ConditionsBeside(
-                                          symbol1: mainRow[0],
-                                          symbol2: mainRow[1],
+                                      conditions.add(
+                                        Condition(
+                                          conditionmod:
+                                              conditionMod.beside,
+                                          symbol1: mainRowTypes()[0],
+                                          symbol2: mainRowTypes()[1],
+                                          besideOrNot: true,
                                         ),
                                       );
                                     });
                                   } else if (isSelections[1]) {
                                     setState(() {
-                                      ConditionsRow.add(
-                                        ConditionsPosition(
+                                      ConditionWidgetRow.add(
+                                        ConditionPosition(
                                           symbol: mainRow[0],
                                           position: 1,
                                         ),
@@ -332,8 +355,8 @@ class _ThemainRowState extends State<ThemainRow> {
                                     });
                                   } else if (isSelections[2]) {
                                     setState(() {
-                                      ConditionsRow.add(
-                                        ConditionsDirection(
+                                      ConditionWidgetRow.add(
+                                        ConditionDirection(
                                           symbol1: mainRow[0],
                                           symbol2: mainRow[1],
                                           leftOrRight: true,
@@ -378,7 +401,7 @@ class _ThemainRowState extends State<ThemainRow> {
                         direction: DismissDirection.endToStart,
                         onDismissed: (direction) {
                           setState(() {
-                            ConditionsRow.removeAt(index);
+                            ConditionWidgetRow.removeAt(index);
                           });
                         },
                         background: Container(
@@ -399,13 +422,22 @@ class _ThemainRowState extends State<ThemainRow> {
                             child: TypeProvider(
                               rowTypes: mainRowTypes(),
                               mainRow: mainRow,
-                              child: ConditionsRow[index],
+                              changeCondition: changeCondition,
+                              child:
+                                  conditions[index].conditionmod ==
+                                      conditionMod.beside
+                                  ? ConditionBeside(
+                                      besideCondition:
+                                          conditions[index],
+                                      conditionIndex: index,
+                                    )
+                                  : Text("你好"),
                             ),
                           ),
                         ),
                       );
                     },
-                    itemCount: ConditionsRow.length,
+                    itemCount: conditions.length,
                   ),
                 ),
               ),
@@ -420,6 +452,7 @@ class _ThemainRowState extends State<ThemainRow> {
             builder: (context) => TypeProvider(
               rowTypes: mainRowTypes(),
               mainRow: mainRow,
+              conditions: conditions,
               child: ResultWidget(),
             ),
           );

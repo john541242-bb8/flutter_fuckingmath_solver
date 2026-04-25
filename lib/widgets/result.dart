@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_fuckingmath_solver/widgets/conditions.dart';
 import 'dataProvider.dart';
 
 class ResultWidget extends StatefulWidget {
@@ -13,6 +14,7 @@ class _ResultWidgetState extends State<ResultWidget> {
   late List<String> resultRow;
   late List<String> list;
   late List<bool> isTakens;
+
   bool isBesideORnot({
     required int index,
     required String nowSymbol,
@@ -65,6 +67,7 @@ class _ResultWidgetState extends State<ResultWidget> {
   String pText = "";
   int count = 0;
   int waitMicroseconds = 0;
+  List<Condition> conditions = [];
 
   //計算總排列數的方法
   Future<void> calculatePermutation(int i) async {
@@ -85,7 +88,7 @@ class _ResultWidgetState extends State<ResultWidget> {
       if (!mounted) return;
       if (!isTakens[j]) {
         //條件判斷
-        // bool needToContinue = true; //當=false，代表可以過這一關
+        bool needToContinue = true; //當=false，代表可以過這一關
         // bool besideORnot = false;
         // if (list[i] == "C") {
         //   if (j == list.length - 1) {
@@ -105,13 +108,21 @@ class _ResultWidgetState extends State<ResultWidget> {
         //   needToContinue = false;
         // }
 
-        if (isBesideORnot(
-          index: j,
-          nowSymbol: list[i],
-          i: "甲",
-          you: "D",
-          besideORnot: false,
-        )) {
+        for (Condition c in conditions) {
+          if (c.conditionmod == conditionMod.beside) {
+            needToContinue = isBesideORnot(
+              index: j,
+              nowSymbol: list[i],
+              i: c.symbol2!,
+              you: c.symbol1,
+              besideORnot: c.besideOrNot!,
+            );
+            if (!needToContinue) {
+              break;
+            }
+          }
+        }
+        if (needToContinue) {
           continue;
         }
         resultRow[j] = list[i];
@@ -146,7 +157,7 @@ class _ResultWidgetState extends State<ResultWidget> {
         .replaceAll("[", "")
         .replaceAll("]", "")
         .replaceAll(",", "");
-
+    conditions = provider.conditions!;
     // 創造有觀賞性的間隔秒數
     waitMicroseconds = list.length <= 4
         ? (4 / list.length).round() * 10000

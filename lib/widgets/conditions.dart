@@ -1,23 +1,65 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_fuckingmath_solver/widgets/dataProvider.dart';
 
-class ConditionsBeside extends StatefulWidget {
-  ConditionsBeside({
-    super.key,
+//傳入的條件class
+class Condition {
+  Condition({
+    required this.conditionmod,
     required this.symbol1,
-    required this.symbol2,
-    this.canOrNot = true,
+    this.symbol2,
+    this.besideOrNot,
+    this.leftOrRight,
+    this.canOnOrNot,
+    this.position,
   });
+  conditionMod conditionmod;
   String symbol1;
-  String symbol2;
-  bool canOrNot;
-
-  @override
-  State<ConditionsBeside> createState() => _ConditionsBesideState();
+  //相鄰或相對位置
+  String? symbol2;
+  //判斷相鄰
+  bool? besideOrNot;
+  //判斷相對位置
+  bool? leftOrRight;
+  //判斷位置
+  bool? canOnOrNot;
+  int? position;
 }
 
-class _ConditionsBesideState extends State<ConditionsBeside> {
-  void selectChangeSymbol(int symbolIndex) {
+enum conditionMod { beside, direction, position }
+
+class ConditionBeside extends StatelessWidget {
+  ConditionBeside({
+    super.key,
+    required this.besideCondition,
+    required this.conditionIndex,
+  });
+
+  final Condition besideCondition;
+  final int conditionIndex;
+
+  void changeOneValueOfCondition({
+    required String valueName,
+    required var value,
+    required TypeProvider provider,
+  }) {
+    provider.changeCondition!(
+      conditionIndex,
+      Condition(
+        conditionmod: conditionMod.beside,
+        symbol1: valueName == "symbol1"
+            ? value
+            : besideCondition.symbol1,
+        symbol2: valueName == "symbol2"
+            ? value
+            : besideCondition.symbol2,
+        besideOrNot: valueName == "besideOrNot"
+            ? value
+            : besideCondition.besideOrNot,
+      ),
+    );
+  }
+
+  void selectChangeSymbol(int symbolIndex, BuildContext context) {
     TypeProvider? provider = TypeProvider.of(context);
 
     showDialog(
@@ -38,17 +80,17 @@ class _ConditionsBesideState extends State<ConditionsBeside> {
                     child: RadioMenuButton(
                       value: e,
                       groupValue: symbolIndex == 1
-                          ? widget.symbol1
-                          : widget.symbol2,
+                          ? besideCondition.symbol1
+                          : besideCondition.symbol2,
                       onChanged: (value) {
                         _setState(() {
-                          setState(() {
-                            if (symbolIndex == 1) {
-                              widget.symbol1 = value!;
-                            } else if (symbolIndex == 2) {
-                              widget.symbol2 = value!;
-                            }
-                          });
+                          changeOneValueOfCondition(
+                            valueName: symbolIndex == 1
+                                ? "symbol1"
+                                : "symbol2",
+                            value: value,
+                            provider: provider,
+                          );
                         });
                       },
                       child: Text(e),
@@ -63,18 +105,12 @@ class _ConditionsBesideState extends State<ConditionsBeside> {
     );
   }
 
-  @override
-  void didChangeDependencies() {
-    // TODO: implement didChangeDependencies
-    super.didChangeDependencies();
-    TypeProvider? provider = TypeProvider.of(context);
-    rowTypes = provider!.rowTypes;
-  }
-
   late List<String> rowTypes;
 
   @override
   Widget build(BuildContext context) {
+    TypeProvider? provider = TypeProvider.of(context);
+
     return FittedBox(
       child: Card(
         color: Colors.grey[200],
@@ -93,9 +129,9 @@ class _ConditionsBesideState extends State<ConditionsBeside> {
                 ),
               ),
               child: InkWell(
-                onTap: () => selectChangeSymbol(1),
+                onTap: () => selectChangeSymbol(1, context),
                 child: Text(
-                  widget.symbol1,
+                  besideCondition.symbol1,
                   style: TextStyle(fontSize: 25),
                 ),
               ),
@@ -109,12 +145,14 @@ class _ConditionsBesideState extends State<ConditionsBeside> {
               ),
               child: InkWell(
                 onTap: () {
-                  setState(() {
-                    widget.canOrNot = !widget.canOrNot;
-                  });
+                  changeOneValueOfCondition(
+                    valueName: "besideOrNot",
+                    value: !besideCondition.besideOrNot!,
+                    provider: provider!,
+                  );
                 },
                 child: Text(
-                  widget.canOrNot ? "必" : "不",
+                  besideCondition.besideOrNot! ? "必" : "不",
                   style: TextStyle(fontSize: 25),
                 ),
               ),
@@ -132,9 +170,9 @@ class _ConditionsBesideState extends State<ConditionsBeside> {
                 ),
               ),
               child: InkWell(
-                onTap: () => selectChangeSymbol(2),
+                onTap: () => selectChangeSymbol(2, context),
                 child: Text(
-                  widget.symbol2,
+                  besideCondition.symbol2!,
                   style: TextStyle(fontSize: 25),
                 ),
               ),
@@ -146,8 +184,8 @@ class _ConditionsBesideState extends State<ConditionsBeside> {
   }
 }
 
-class ConditionsPosition extends StatefulWidget {
-  ConditionsPosition({
+class ConditionPosition extends StatefulWidget {
+  ConditionPosition({
     super.key,
     required this.symbol,
     required this.position,
@@ -158,11 +196,10 @@ class ConditionsPosition extends StatefulWidget {
   bool isOrNot;
 
   @override
-  State<ConditionsPosition> createState() =>
-      _ConditionsPositionState();
+  State<ConditionPosition> createState() => _ConditionPositionState();
 }
 
-class _ConditionsPositionState extends State<ConditionsPosition> {
+class _ConditionPositionState extends State<ConditionPosition> {
   void selectChangeSymbol() {
     TypeProvider? provider = TypeProvider.of(context);
 
@@ -294,8 +331,8 @@ class _ConditionsPositionState extends State<ConditionsPosition> {
   }
 }
 
-class ConditionsDirection extends StatefulWidget {
-  ConditionsDirection({
+class ConditionDirection extends StatefulWidget {
+  ConditionDirection({
     super.key,
     required this.symbol1,
     required this.symbol2,
@@ -306,11 +343,11 @@ class ConditionsDirection extends StatefulWidget {
   bool leftOrRight;
 
   @override
-  State<ConditionsDirection> createState() =>
-      _ConditionsDirectionState();
+  State<ConditionDirection> createState() =>
+      _ConditionDirectionState();
 }
 
-class _ConditionsDirectionState extends State<ConditionsDirection> {
+class _ConditionDirectionState extends State<ConditionDirection> {
   void selectChangeSymbol(int symbolIndex) {
     TypeProvider? provider = TypeProvider.of(context);
 
