@@ -65,41 +65,36 @@ class ConditionBeside extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) {
-        return StatefulBuilder(
-          builder: (context, _setState) {
-            return AlertDialog(
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: provider!.rowTypes.map((e) {
-                  return RadioTheme(
-                    data: RadioThemeData(
-                      fillColor: WidgetStatePropertyAll(
-                        Colors.amber[900],
-                      ),
-                    ),
-                    child: RadioMenuButton(
-                      value: e,
-                      groupValue: symbolIndex == 1
-                          ? besideCondition.symbol1
-                          : besideCondition.symbol2,
-                      onChanged: (value) {
-                        _setState(() {
-                          changeOneValueOfCondition(
-                            valueName: symbolIndex == 1
-                                ? "symbol1"
-                                : "symbol2",
-                            value: value,
-                            provider: provider,
-                          );
-                        });
-                      },
-                      child: Text(e),
-                    ),
-                  );
-                }).toList(),
-              ),
-            );
-          },
+        return AlertDialog(
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: provider!.rowTypes.map((e) {
+              return RadioTheme(
+                data: RadioThemeData(
+                  fillColor: WidgetStatePropertyAll(
+                    Colors.amber[900],
+                  ),
+                ),
+                child: RadioMenuButton(
+                  value: e,
+                  groupValue: symbolIndex == 1
+                      ? besideCondition.symbol1
+                      : besideCondition.symbol2,
+                  onChanged: (value) {
+                    changeOneValueOfCondition(
+                      valueName: symbolIndex == 1
+                          ? "symbol1"
+                          : "symbol2",
+                      value: value,
+                      provider: provider,
+                    );
+                    Navigator.pop(context);
+                  },
+                  child: Text(e),
+                ),
+              );
+            }).toList(),
+          ),
         );
       },
     );
@@ -184,75 +179,81 @@ class ConditionBeside extends StatelessWidget {
   }
 }
 
-class ConditionPosition extends StatefulWidget {
+class ConditionPosition extends StatelessWidget {
   ConditionPosition({
     super.key,
-    required this.symbol,
-    required this.position,
-    this.isOrNot = false,
+    required this.positionCondition,
+    required this.conditionIndex,
   });
-  String symbol;
-  int position;
-  bool isOrNot;
+  final Condition positionCondition;
+  final int conditionIndex;
 
-  @override
-  State<ConditionPosition> createState() => _ConditionPositionState();
-}
+  void changeOneValueOfCondition({
+    required String valueName,
+    required var value,
+    required TypeProvider provider,
+  }) {
+    provider.changeCondition!(
+      conditionIndex,
+      Condition(
+        conditionmod: conditionMod.position,
+        symbol1: valueName == "symbol1"
+            ? value
+            : positionCondition.symbol1,
+        position: valueName == "position"
+            ? value
+            : positionCondition.position,
+        canOnOrNot: valueName == "canOnOrNot"
+            ? value
+            : positionCondition.canOnOrNot,
+      ),
+    );
+  }
 
-class _ConditionPositionState extends State<ConditionPosition> {
-  void selectChangeSymbol() {
+  void selectChangeSymbol(int symbolIndex, BuildContext context) {
     TypeProvider? provider = TypeProvider.of(context);
 
     showDialog(
       context: context,
       builder: (context) {
-        return StatefulBuilder(
-          builder: (context, _setState) {
-            return AlertDialog(
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: provider!.rowTypes.map((e) {
-                  return RadioTheme(
-                    data: RadioThemeData(
-                      fillColor: WidgetStatePropertyAll(
-                        Colors.amber[900],
-                      ),
-                    ),
-                    child: RadioMenuButton(
-                      value: e,
-                      groupValue: widget.symbol,
-                      onChanged: (value) {
-                        _setState(() {
-                          setState(() {
-                            widget.symbol = value!;
-                          });
-                        });
-                      },
-                      child: Text(e),
-                    ),
-                  );
-                }).toList(),
-              ),
-            );
-          },
+        return AlertDialog(
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: provider!.rowTypes.map((e) {
+              return RadioTheme(
+                data: RadioThemeData(
+                  fillColor: WidgetStatePropertyAll(
+                    Colors.amber[900],
+                  ),
+                ),
+                child: RadioMenuButton(
+                  value: e,
+                  groupValue: positionCondition.symbol1,
+                  onChanged: (value) {
+                    changeOneValueOfCondition(
+                      valueName: "symbol1",
+                      value: value,
+                      provider: provider,
+                    );
+                    Navigator.pop(context);
+                  },
+                  child: Text(e),
+                ),
+              );
+            }).toList(),
+          ),
         );
       },
     );
   }
 
-  late TextEditingController changePosController;
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    changePosController = TextEditingController(
-      text: "${widget.position}",
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
+    TypeProvider? provider = TypeProvider.of(context);
+    TextEditingController changePosController = TextEditingController(
+      text: "${positionCondition.position}",
+    );
+
     return FittedBox(
       child: Card(
         color: Colors.grey[200],
@@ -265,15 +266,12 @@ class _ConditionPositionState extends State<ConditionPosition> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.all(.circular(10)),
-                border: Border.all(
-                  color: Colors.blue, // Outline color
-                  width: 2.0, // Outline thickness
-                ),
+                border: Border.all(color: Colors.blue, width: 2.0),
               ),
               child: InkWell(
-                onTap: () => selectChangeSymbol(),
+                onTap: () => selectChangeSymbol(1, context),
                 child: Text(
-                  widget.symbol,
+                  positionCondition.symbol1,
                   style: TextStyle(fontSize: 25),
                 ),
               ),
@@ -287,12 +285,14 @@ class _ConditionPositionState extends State<ConditionPosition> {
               ),
               child: InkWell(
                 onTap: () {
-                  setState(() {
-                    widget.isOrNot = !widget.isOrNot;
-                  });
+                  changeOneValueOfCondition(
+                    valueName: "canOnOrNot",
+                    value: !positionCondition.canOnOrNot!,
+                    provider: provider!,
+                  );
                 },
                 child: Text(
-                  widget.isOrNot ? "只能" : "不能",
+                  positionCondition.canOnOrNot! ? "只能" : "不能",
                   style: TextStyle(fontSize: 25),
                 ),
               ),
@@ -302,12 +302,14 @@ class _ConditionPositionState extends State<ConditionPosition> {
               width: 40,
               child: TextField(
                 controller: changePosController,
-                onEditingComplete: () => setState(() {
-                  widget.position = int.parse(
-                    changePosController.text,
+                onEditingComplete: () {
+                  changeOneValueOfCondition(
+                    valueName: "position",
+                    value: int.parse(changePosController.text),
+                    provider: provider!,
                   );
                   FocusScope.of(context).unfocus();
-                }),
+                },
                 style: TextStyle(fontSize: 25),
                 textAlign: TextAlign.center,
                 cursorColor: Colors.black,
@@ -321,7 +323,6 @@ class _ConditionPositionState extends State<ConditionPosition> {
                 ),
               ),
             ),
-
             Text("位", style: TextStyle(fontSize: 25)),
             SizedBox(width: 20),
           ],
@@ -331,64 +332,73 @@ class _ConditionPositionState extends State<ConditionPosition> {
   }
 }
 
-class ConditionDirection extends StatefulWidget {
+class ConditionDirection extends StatelessWidget {
   ConditionDirection({
     super.key,
-    required this.symbol1,
-    required this.symbol2,
-    required this.leftOrRight,
+    required this.directionCondition,
+    required this.conditionIndex,
   });
-  String symbol1;
-  String symbol2;
-  bool leftOrRight;
+  final Condition directionCondition;
+  final int conditionIndex;
 
-  @override
-  State<ConditionDirection> createState() =>
-      _ConditionDirectionState();
-}
+  void changeOneValueOfCondition({
+    required String valueName,
+    required var value,
+    required TypeProvider provider,
+  }) {
+    provider.changeCondition!(
+      conditionIndex,
+      Condition(
+        conditionmod: conditionMod.direction,
+        symbol1: valueName == "symbol1"
+            ? value
+            : directionCondition.symbol1,
+        symbol2: valueName == "symbol2"
+            ? value
+            : directionCondition.symbol2,
+        leftOrRight: valueName == "leftOrRight"
+            ? value
+            : directionCondition.leftOrRight,
+      ),
+    );
+  }
 
-class _ConditionDirectionState extends State<ConditionDirection> {
-  void selectChangeSymbol(int symbolIndex) {
+  void selectChangeSymbol(int symbolIndex, BuildContext context) {
     TypeProvider? provider = TypeProvider.of(context);
 
     showDialog(
       context: context,
       builder: (context) {
-        return StatefulBuilder(
-          builder: (context, _setState) {
-            return AlertDialog(
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: provider!.rowTypes.map((e) {
-                  return RadioTheme(
-                    data: RadioThemeData(
-                      fillColor: WidgetStatePropertyAll(
-                        Colors.amber[900],
-                      ),
-                    ),
-                    child: RadioMenuButton(
-                      value: e,
-                      groupValue: symbolIndex == 1
-                          ? widget.symbol1
-                          : widget.symbol2,
-                      onChanged: (value) {
-                        _setState(() {
-                          setState(() {
-                            if (symbolIndex == 1) {
-                              widget.symbol1 = value!;
-                            } else if (symbolIndex == 2) {
-                              widget.symbol2 = value!;
-                            }
-                          });
-                        });
-                      },
-                      child: Text(e),
-                    ),
-                  );
-                }).toList(),
-              ),
-            );
-          },
+        return AlertDialog(
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: provider!.rowTypes.map((e) {
+              return RadioTheme(
+                data: RadioThemeData(
+                  fillColor: WidgetStatePropertyAll(
+                    Colors.amber[900],
+                  ),
+                ),
+                child: RadioMenuButton(
+                  value: e,
+                  groupValue: symbolIndex == 1
+                      ? directionCondition.symbol1
+                      : directionCondition.symbol2,
+                  onChanged: (value) {
+                    changeOneValueOfCondition(
+                      valueName: symbolIndex == 1
+                          ? "symbol1"
+                          : "symbol2",
+                      value: value,
+                      provider: provider,
+                    );
+                    Navigator.pop(context);
+                  },
+                  child: Text(e),
+                ),
+              );
+            }).toList(),
+          ),
         );
       },
     );
@@ -396,6 +406,8 @@ class _ConditionDirectionState extends State<ConditionDirection> {
 
   @override
   Widget build(BuildContext context) {
+    TypeProvider? provider = TypeProvider.of(context);
+
     return FittedBox(
       child: Card(
         color: Colors.grey[200],
@@ -408,20 +420,16 @@ class _ConditionDirectionState extends State<ConditionDirection> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.all(.circular(10)),
-                border: Border.all(
-                  color: Colors.blue, // Outline color
-                  width: 2.0, // Outline thickness
-                ),
+                border: Border.all(color: Colors.blue, width: 2.0),
               ),
               child: InkWell(
-                onTap: () => selectChangeSymbol(1),
+                onTap: () => selectChangeSymbol(1, context),
                 child: Text(
-                  widget.symbol1,
+                  directionCondition.symbol1,
                   style: TextStyle(fontSize: 25),
                 ),
               ),
             ),
-
             Text("位於", style: TextStyle(fontSize: 25)),
             Container(
               padding: EdgeInsets.all(10),
@@ -429,15 +437,12 @@ class _ConditionDirectionState extends State<ConditionDirection> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.all(.circular(10)),
-                border: Border.all(
-                  color: Colors.blue, // Outline color
-                  width: 2.0, // Outline thickness
-                ),
+                border: Border.all(color: Colors.blue, width: 2.0),
               ),
               child: InkWell(
-                onTap: () => selectChangeSymbol(2),
+                onTap: () => selectChangeSymbol(2, context),
                 child: Text(
-                  widget.symbol2,
+                  directionCondition.symbol2!,
                   style: TextStyle(fontSize: 25),
                 ),
               ),
@@ -451,11 +456,15 @@ class _ConditionDirectionState extends State<ConditionDirection> {
                 borderRadius: BorderRadius.all(.circular(10)),
               ),
               child: InkWell(
-                onTap: () => setState(() {
-                  widget.leftOrRight = !widget.leftOrRight;
-                }),
+                onTap: () {
+                  changeOneValueOfCondition(
+                    valueName: "leftOrRight",
+                    value: !directionCondition.leftOrRight!,
+                    provider: provider!,
+                  );
+                },
                 child: Text(
-                  widget.leftOrRight ? "左方" : "右方",
+                  directionCondition.leftOrRight! ? "左方" : "右方",
                   style: TextStyle(fontSize: 25),
                 ),
               ),

@@ -346,17 +346,22 @@ class _ThemainRowState extends State<ThemainRow> {
                                     });
                                   } else if (isSelections[1]) {
                                     setState(() {
-                                      ConditionWidgetRow.add(
-                                        ConditionPosition(
-                                          symbol: mainRow[0],
+                                      conditions.add(
+                                        Condition(
+                                          conditionmod:
+                                              conditionMod.position,
+                                          symbol1: mainRow[0],
                                           position: 1,
+                                          canOnOrNot: true,
                                         ),
                                       );
                                     });
                                   } else if (isSelections[2]) {
                                     setState(() {
-                                      ConditionWidgetRow.add(
-                                        ConditionDirection(
+                                      conditions.add(
+                                        Condition(
+                                          conditionmod:
+                                              conditionMod.direction,
                                           symbol1: mainRow[0],
                                           symbol2: mainRow[1],
                                           leftOrRight: true,
@@ -431,7 +436,18 @@ class _ThemainRowState extends State<ThemainRow> {
                                           conditions[index],
                                       conditionIndex: index,
                                     )
-                                  : Text("你好"),
+                                  : conditions[index].conditionmod ==
+                                        conditionMod.position
+                                  ? ConditionPosition(
+                                      positionCondition:
+                                          conditions[index],
+                                      conditionIndex: index,
+                                    )
+                                  : ConditionDirection(
+                                      directionCondition:
+                                          conditions[index],
+                                      conditionIndex: index,
+                                    ),
                             ),
                           ),
                         ),
