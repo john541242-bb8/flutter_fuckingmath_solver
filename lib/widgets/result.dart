@@ -64,6 +64,23 @@ class _ResultWidgetState extends State<ResultWidget> {
     return true;
   }
 
+  bool isPositionOrNot({
+    required String nowSymbol,
+    required int nowIndex,
+    required int position,
+    required String symbol,
+    required bool canOnOrNot,
+  }) {
+    if (nowSymbol == symbol) {
+      if ((nowIndex == position - 1) == canOnOrNot) {
+        return false;
+      }
+    } else {
+      return false;
+    }
+    return true;
+  }
+
   String pText = "";
   int count = 0;
   int waitMicroseconds = 0;
@@ -79,6 +96,7 @@ class _ResultWidgetState extends State<ResultWidget> {
             .replaceAll("]", "")
             .replaceAll(",", "");
         count++;
+        print(resultRow);
       });
       // print(resultRow);
       await Future.delayed(Duration(microseconds: waitMicroseconds));
@@ -89,24 +107,6 @@ class _ResultWidgetState extends State<ResultWidget> {
       if (!isTakens[j]) {
         //條件判斷
         bool needToContinue = true; //當=false，代表可以過這一關
-        // bool besideORnot = false;
-        // if (list[i] == "C") {
-        //   if (j == list.length - 1) {
-        //     if ((resultRow[j - 1] == "B") == besideORnot) {
-        //       needToContinue = false;
-        //     }
-        //   } else if (j == 0) {
-        //     if ((resultRow[j + 1] == "B") == besideORnot) {
-        //       needToContinue = false;
-        //     }
-        //   } else if ((resultRow[j - 1] == "B") ==
-        //           besideORnot && //如果是相鄰：只要旁邊有就滿足條件！！不相鄰：兩邊都要同時沒有！！
-        //       (resultRow[j + 1] == "B") == besideORnot) {
-        //     needToContinue = false;
-        //   }
-        // } else {
-        //   needToContinue = false;
-        // }
 
         for (Condition c in conditions) {
           if (c.conditionmod == conditionMod.beside) {
@@ -117,11 +117,24 @@ class _ResultWidgetState extends State<ResultWidget> {
               you: c.symbol1,
               besideORnot: c.besideOrNot!,
             );
-            if (!needToContinue) {
+            //如果有其中一個條件不符合這個排列就不能算
+            if (needToContinue) {
+              break;
+            }
+          } else if (c.conditionmod == conditionMod.position) {
+            needToContinue = isPositionOrNot(
+              nowSymbol: list[i],
+              nowIndex: j,
+              position: c.position!,
+              symbol: c.symbol1,
+              canOnOrNot: c.canOnOrNot!,
+            );
+            if (needToContinue) {
               break;
             }
           }
         }
+
         if (needToContinue) {
           continue;
         }
@@ -158,6 +171,21 @@ class _ResultWidgetState extends State<ResultWidget> {
         .replaceAll("]", "")
         .replaceAll(",", "");
     conditions = provider.conditions!;
+
+    //把排序用好
+    for (Condition c in conditions) {
+      if (c.conditionmod == conditionMod.beside) {
+        int i_index = list.indexWhere((x) => x == c.symbol2);
+        int you_index = list.indexWhere((x) => x == c.symbol1);
+
+        //符號互換
+        if (i_index < you_index) {
+          String temp = c.symbol2!;
+          c.symbol2 = c.symbol1;
+          c.symbol1 = temp;
+        }
+      }
+    }
     // 創造有觀賞性的間隔秒數
     waitMicroseconds = list.length <= 4
         ? (4 / list.length).round() * 10000

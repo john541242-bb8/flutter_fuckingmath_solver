@@ -406,7 +406,7 @@ class _ThemainRowState extends State<ThemainRow> {
                         direction: DismissDirection.endToStart,
                         onDismissed: (direction) {
                           setState(() {
-                            ConditionWidgetRow.removeAt(index);
+                            conditions.removeAt(index);
                           });
                         },
                         background: Container(
