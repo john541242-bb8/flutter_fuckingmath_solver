@@ -24,9 +24,8 @@ class _ResultWidgetState extends State<ResultWidget> {
   }) {
     //false可以通過 true這round必須跳過
     //如果是相鄰：只要旁邊有就滿足條件！！不相鄰：兩邊都要同時沒有！！
-
-    if (besideORnot) {
-      if (nowSymbol == i) {
+    if (nowSymbol == i) {
+      if (besideORnot) {
         if (index == list.length - 1) {
           if (resultRow[index - 1] == you) {
             return false;
@@ -40,10 +39,6 @@ class _ResultWidgetState extends State<ResultWidget> {
           return false;
         }
       } else {
-        return false;
-      }
-    } else {
-      if (nowSymbol == i) {
         if (index == list.length - 1) {
           if (!(resultRow[index - 1] == you)) {
             return false;
@@ -56,9 +51,9 @@ class _ResultWidgetState extends State<ResultWidget> {
             !(resultRow[index + 1] == you)) {
           return false;
         }
-      } else {
-        return false;
       }
+    } else {
+      return false;
     }
 
     return true;
@@ -78,6 +73,30 @@ class _ResultWidgetState extends State<ResultWidget> {
     } else {
       return false;
     }
+    return true;
+  }
+
+  bool isLeftOrRight({
+    required int index,
+    required String nowSymbol,
+    required String i,
+    required String you,
+    required bool leftOrRight,
+  }) {
+    if (nowSymbol == i) {
+      if (leftOrRight) {
+        if (resultRow.indexWhere((x) => x == you) < index) {
+          return false;
+        }
+      } else {
+        if (resultRow.indexWhere((x) => x == you) > index) {
+          return false;
+        }
+      }
+    } else {
+      return false;
+    }
+
     return true;
   }
 
@@ -106,8 +125,9 @@ class _ResultWidgetState extends State<ResultWidget> {
       if (!mounted) return;
       if (!isTakens[j]) {
         //條件判斷
-        bool needToContinue = true; //當=false，代表可以過這一關
+        bool needToContinue = false; //當=false，代表可以過這一關
 
+        //遍歷所有的條件
         for (Condition c in conditions) {
           if (c.conditionmod == conditionMod.beside) {
             needToContinue = isBesideORnot(
@@ -128,6 +148,17 @@ class _ResultWidgetState extends State<ResultWidget> {
               position: c.position!,
               symbol: c.symbol1,
               canOnOrNot: c.canOnOrNot!,
+            );
+            if (needToContinue) {
+              break;
+            }
+          } else if (c.conditionmod == conditionMod.direction) {
+            needToContinue = isLeftOrRight(
+              index: j,
+              nowSymbol: list[i],
+              i: c.symbol2!,
+              you: c.symbol1,
+              leftOrRight: c.leftOrRight!,
             );
             if (needToContinue) {
               break;
@@ -183,6 +214,17 @@ class _ResultWidgetState extends State<ResultWidget> {
           String temp = c.symbol2!;
           c.symbol2 = c.symbol1;
           c.symbol1 = temp;
+        }
+      }
+      if (c.conditionmod == conditionMod.direction) {
+        int i_index = list.indexWhere((x) => x == c.symbol2);
+        int you_index = list.indexWhere((x) => x == c.symbol1);
+
+        if (i_index < you_index) {
+          String temp = c.symbol2!;
+          c.symbol2 = c.symbol1;
+          c.symbol1 = temp;
+          c.leftOrRight = !c.leftOrRight!;
         }
       }
     }
